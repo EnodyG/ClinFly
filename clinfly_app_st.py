@@ -18,6 +18,9 @@ from utilities.convert import (
     convert_list_phenogenius,
     convert_pdf_to_text,
 )
+from utilities.omop_hpo import(
+    from_hpo_to_omop,
+)
 from utilities.extract_hpo import add_biometrics, extract_hpo
 from utilities.get_model import get_nlp_marian  # get_models
 import streamlit as st
@@ -82,6 +85,8 @@ if st.session_state.load_models is True:
             key="letter",
         )
         uploaded_file = st.file_uploader("Or upload it (only pdf files are supported)")
+
+        omop = st.checkbox("Perform a mapping between HPO and OMOP concept ID (Increases treatment time)", value=False, key=None, help="Whether you want a mapping between HPO and OMOP or not")
 
         submit_button = st.form_submit_button(label="Submit report")
 
@@ -181,9 +186,40 @@ if st.session_state.load_models is True:
         ]
         clinphen_all = pd.concat([clinphen, clinphen_unsafe_check_raw]).reset_index()
         clinphen_all = clinphen_all[cols]
+        clinphen_df = clinphen_all 
+
+        with st.spinner("Mapping between HPO ID and Omop concept ID, it takes a moment, please wait"):
+            if omop and "clinphen_df" not in st.session_state:
+                concept_id = []
+                concept_name = []
+                concept_code= []
+                concept_vocab = []
+                for hpo in clinphen_df["HPO ID"]:
+                    hpo_omop_df = from_hpo_to_omop(hpo)
+                    if not isinstance(hpo_omop_df,str):
+                        concept_id.append(hpo_omop_df['CONCEPT_ID'])
+                        concept_name.append(hpo_omop_df['CONCEPT_NAME'])
+                        concept_code.append(hpo_omop_df['CONCEPT_CODE'])
+                        concept_vocab.append(hpo_omop_df['CONCEPT_VOCAB'])
+                    else:
+                        concept_id.append('None')
+                        concept_name.append(hpo_omop_df)
+                        concept_code.append('None')
+                        concept_vocab.append('None')
+                clinphen_df['Omop Concept Id'] = concept_id   
+                clinphen_df['Omop Concept Name'] = concept_name   
+                clinphen_df['Omop Concept Code'] = concept_code   
+                clinphen_df['Omop Concept Vocab'] = concept_vocab    
+                clinphen_df = clinphen_df.applymap(lambda x: ', '.join(map(str, x)) if isinstance(x, list) else x)
+                st.session_state.clinphen_df = clinphen_df
+
+        if "clinphen_df" in st.session_state:
+            clinphen_df = st.session_state.clinphen_df
+
         clinphen_df = st.data_editor(
-            clinphen_all, num_rows="dynamic", key="data_editor"
+            clinphen_df, num_rows="dynamic", key="data_editor"
         )
+
         clinphen_df_without_low_confidence = clinphen_df[
             clinphen_df["To keep in list"] == True
         ]
@@ -205,7 +241,7 @@ if st.session_state.load_models is True:
 
         st.download_button(
             "Download summarized letter in Phenotips JSON format (hygen compatible)",
-            convert_json(clinphen_df_without_low_confidence),
+            convert_json(clinphen_df_without_low_confidence,omop),
             nom + "_" + prenom + "_summarized_letter.json",
             "json",
             key="download-summarization-json",
@@ -213,7 +249,7 @@ if st.session_state.load_models is True:
 
         st.download_button(
             "Download summarized letter in PhenoGenius list of HPO format",
-            convert_list_phenogenius(clinphen_df_without_low_confidence),
+            convert_list_phenogenius(clinphen_df_without_low_confidence,omop),
             nom + "_" + prenom + "_summarized_letter.txt",
             "text",
             key="download-summarization-phenogenius",

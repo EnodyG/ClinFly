@@ -52,6 +52,7 @@ nvidia-cusparse-cu12==12.1.0.106 ; platform_system == "Linux" and platform_machi
 nvidia-nccl-cu12==2.20.5 ; platform_system == "Linux" and platform_machine == "x86_64" and python_full_version >= "3.8.0" and python_full_version != "3.9.7" and python_version < "3.12"
 nvidia-nvjitlink-cu12==12.5.82 ; platform_system == "Linux" and platform_machine == "x86_64" and python_full_version >= "3.8.0" and python_full_version != "3.9.7" and python_version < "3.12"
 nvidia-nvtx-cu12==12.1.105 ; platform_system == "Linux" and platform_machine == "x86_64" and python_full_version >= "3.8.0" and python_full_version != "3.9.7" and python_version < "3.12"
+openpyxl==3.1.2 ; python_version >= "3.8" and python_full_version != "3.9.7" and python_version < "3.12"
 packaging==24.1 ; python_version >= "3.8" and python_full_version != "3.9.7" and python_version < "3.12"
 pandas==1.5.3 ; python_version >= "3.8" and python_full_version != "3.9.7" and python_version < "3.12"
 pdf2image==1.17.0 ; python_full_version >= "3.8.0" and python_full_version != "3.9.7" and python_version < "3.12"

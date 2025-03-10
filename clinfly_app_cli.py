@@ -20,6 +20,9 @@ from utilities.convert import (
     convert_list_phenogenius,
     convert_pdf_to_text,
 )
+from utilities.omop_hpo import(
+    from_hpo_to_omop,
+)
 from utilities.extract_hpo import add_biometrics, extract_hpo
 from utilities.get_model import get_models, get_nlp_marian
 import gc
@@ -120,6 +123,31 @@ def main():
     clinphen_all = clinphen_all[cols]
 
     clinphen_df = clinphen_all
+
+    if args.omop:
+        print("Mapping between HPO ID and Omop concept ID...")
+        concept_id = []
+        concept_name = []
+        concept_code= []
+        concept_vocab = []
+        for hpo in clinphen_df["HPO ID"]:
+            hpo_omop_df = from_hpo_to_omop(hpo)
+            if not isinstance(hpo_omop_df,str):
+                concept_id.append(hpo_omop_df['CONCEPT_ID'])
+                concept_name.append(hpo_omop_df['CONCEPT_NAME'])
+                concept_code.append(hpo_omop_df['CONCEPT_CODE'])
+                concept_vocab.append(hpo_omop_df['CONCEPT_VOCAB'])
+            else:
+                concept_id.append('None')
+                concept_name.append(hpo_omop_df)
+                concept_code.append('None')
+                concept_vocab.append('None')
+        clinphen_df['Omop Concept Id'] = concept_id   
+        clinphen_df['Omop Concept Name'] = concept_name   
+        clinphen_df['Omop Concept Code'] = concept_code   
+        clinphen_df['Omop Concept Vocab'] = concept_vocab    
+        clinphen_df = clinphen_df.applymap(lambda x: ', '.join(map(str, x)) if isinstance(x, list) else x)
+
     clinphen_df_without_low_confidence = clinphen_df[
         clinphen_df["To keep in list"] == True
     ]
@@ -159,7 +187,7 @@ def main():
         + "_summarized_report.json",
         "w",
     ) as file:
-        file.write(convert_json(clinphen_df_without_low_confidence))
+        file.write(convert_json(clinphen_df_without_low_confidence,args.omop))
     print(
         "JSON file created successfully : "
         + os.path.join(args.result_dir, "JSON", "")
@@ -181,7 +209,7 @@ def main():
         + "_summarized_report.txt",
         "w",
     ) as file:
-        file.write(convert_list_phenogenius(clinphen_df_without_low_confidence))
+        file.write(convert_list_phenogenius(clinphen_df_without_low_confidence,args.omop))
     print(
         "Text file created successfully : "
         + os.path.join(args.result_dir, "TXT", "")
@@ -223,6 +251,11 @@ if __name__ == "__main__":
         default="Results",
         type=str,
         help="The directory where the results will be placed.",
+    )
+    parser.add_argument(
+        "--omop",
+        action=argparse.BooleanOptionalAction,
+        help="Whether you want a mapping between HPO and OMOP or not",
     )
 
     args = parser.parse_args()
