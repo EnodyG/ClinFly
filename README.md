@@ -86,3 +86,8 @@ ClinFly is a tool developed by University Hospital of Montpellier and Hospices C
 
 If you use ClinFly, please cite:
 > Gauthier et al., Assessing feasibility and risk to translate, de-identify and summarize medical letters using deep learning. medrXiv (2023). [https://doi.org/10.1101/2023.07.27.23293234](https://doi.org/10.1101/2023.07.27.23293234)
+
+For the omop database we use the dataset of the OMOP2OBO project
+> Callahan, T. J., Wyrwa, J. M., Vasilevsky, N. A., Bennett, T. D., Martin, B., Feinstein, J. A., Baumgartner, W. A., Hunter, L. D., & Kahn, M. G. (2022). OMOP2OBO Condition Occurrence Mappings (V1.5) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7250177
+
+For the HPO information we use the dataset of the EMBL-EBI Ontology Lookup Service
