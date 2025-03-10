@@ -90,4 +90,4 @@ If you use ClinFly, please cite:
 For the omop database we use the dataset of the OMOP2OBO project
 > Callahan, T. J., Wyrwa, J. M., Vasilevsky, N. A., Bennett, T. D., Martin, B., Feinstein, J. A., Baumgartner, W. A., Hunter, L. D., & Kahn, M. G. (2022). OMOP2OBO Condition Occurrence Mappings (V1.5) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7250177
 
-For the HPO information we use the dataset of the EMBL-EBI Ontology Lookup Service
+For the HPO informations we use the dataset of the EMBL-EBI Ontology Lookup Service
